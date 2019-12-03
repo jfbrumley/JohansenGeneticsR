@@ -1,0 +1,32 @@
+25 25 25 25
+26 14 20 40
+10 30 30 30
+51 10 19 20
+25 23 17 35
+
+26 25 24 25
+23 16 31 30
+15 25 30 30
+46 14 22 18
+25 23 17 35
+
+
+Explanation: 
+
+These numbers are allele counts. Here we have 5 loci (rows) each with 4 alleles (columns).
+The numbers are the counts of the alleles within the genotype data of the species as a whole.
+Each count is separated by a space.
+The blank row/space between the two groupings represents a temporal difference.
+We could consider the top grouping as generation 1 and the other as generation x.
+
+The .pdf for the package explains each number as n(i,j,k).
+i = temporal unit
+j = locus
+k = allele count
+
+So our dataset above would be:
+n(1,1,25) n(1,1,25) n(1,1,25) n(1,1,25)
+n(1,2,26) n(1,2,14) n(1,2,20) n(1,2,40)...
+
+n(2,1,26) n(2,1,25) n(2,1,24) n(2,1,25)
+n(2,2,23) n(2,2,16) n(2,2,31) n(2,2,30)...

@@ -1,0 +1,72 @@
+Microsatellite on Species1
+Prim001
+Prim002
+Prim003
+Pop 
+Indiv001, 0101 0102 0103 
+Indiv002, 0103 0101 0304
+Indiv003, 0105 0101 0303
+Indiv004, 0203 0202 0204
+Indiv005, 0404 0102 0102
+Pop 
+Indiv006, 0505 0101 0103
+Indiv007, 0204 0101 0101
+Indiv008, 0303 0202 0203
+Indiv009, 0202 0102 0404
+Indiv0010, 0203 0102 0204
+Pop 
+Indiv011, 0405 0202 0304
+Indiv012, 0505 0202 0102
+Indiv013, 0103 0102 0101
+Indiv014, 0102 0102 0303
+Indiv015, 0202 0102 0203
+
+
+Explanation:
+
+We are looking at the microsatellite genotype data for a single species (Species1).
+We are using 3 loci (Prim001, Prim002, Prim003).
+We have genotype data for 15 individuals (Indiv001 through Indiv015).
+These 15 individuals are part of 3 "populations", each with 5 individuals.
+  Note that the analyses will name the "populations" with the first individual's ID.
+
+Here, we explore the "genepop" format for genotype data. We use the genepop 2 method, where each allele gets a double-digit number.
+So, we can break this down in a couple of ways:
+
+ 1. Each column of numbers is related to a locus/primer
+	Column 1 = Prim001
+	Column 2 = Prim002
+	Column 3 = Prim003
+
+ 2. Each set of 4 numbers is the genotype of the individual for that locus
+	Inidv001 has a 0101 genotype for locus Prim001 and a 0102 genotype for locus Prim002
+
+ 3. Genotypes are denoted specifically for each locus, as such:
+	Prim001 has 5 alleles present in the species
+		Each allele is given a specific number (01 through 05)
+		Each individual's genotype is then converted to these numbers (Indiv013 has a genotype of 0103)
+ 4. notes: always separate individuals from genotypes with a comma
+	   "Pop" is always needed to separate "populations" from each other
+
+
+Example:
+From GeneMarker format to Genepop format:
+
+We can look specifically as Prim003.
+We look through all 15 individuals as see 4 distinct alleles.
+	These alleles are at bp = c(214, 220, 224, 232).
+We can then give each distinct allele a number 01 through 04.
+	bp 214 = 01
+	bp 220 = 02
+	bp 224 = 03
+	bp 232 = 04
+Then we go through each individual and assign these numbers to their genotypes.
+	Indiv001 genotype = bp 214, 224 -> therefore in genepop = 0103
+	Indiv005 genotype = bp 214, 220 -> therefore in genepop = 0102
+	Indiv009 genotype = bp 232 -> therefore in genepop = 0404
+	Indiv013 genotype = bp 214 -> therefore in genepop = 0101
+	Indiv015 genotype = bp 220, 224 -> therefore in genepop = 0203
+Homozygous individuals are given 0x0x genotypes.
+Heterozygous individuals are given 0x0y genotypes.
+			
+**This explanation works for the Data.gen file as well - it's identical to DaTa.txt.**

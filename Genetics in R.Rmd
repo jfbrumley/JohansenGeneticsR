@@ -1,0 +1,428 @@
+---
+title: <center><span style = "color:darkblue">Population Genetics in R</span></center>
+author: |
+  <center>Jacob F. Brumley</center>
+  <center><font size = "2">Johansen Lab of Ichthyology at APSU, Dept. of Biology and Center of Excellence for Field Biology</font></center>
+output: 
+  html_document:
+    theme: cerulean
+    highlight: haddock
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+---
+
+----------------------------------------------------------------------------
+
+This `RMarkdown` was created by the Johansen Lab for use in population genetics studies. Compiled as a functional list of code for various packages used for genetic analyses.
+
+Each chunk of code is specific for a certain population genetic metric.
+
+Within each code: "DaTa" will be the genind object the data file is saved. 
+
+In this Markdown document, I will be demonstrating an example of loading the genotype data into R in the *genepop* format. Note that both "DaTa.txt" and "DaTa.gen" are the same files in different formats. I would create the "DaTa.txt" file from the genotype data, copy and paste in another folder, change the file type to ".gen", and move both it into the project folder.
+
+I have added example data documents (".txt", ".gen", and ".csv" files) into the 'inputs' folder of the R-Project. The "DaTa.txt"/"DaTa.gen" and "NB.txt" files are accompanied with explanation ".txt" files that explain the format for each document.
+
+For help with *genepop* format reference:
+
+http://www.med.kagawa-u.ac.jp/~genomelb/takezaki/poptree2/test_genepop.html
+
+**Instruction:**
+
+**First**, create an R-Project with a set directory. 
+
+**Second**, within the project folder, create an 'inputs' folder where you store your genotype data (in *genepop* format in two identical documents - one a ".txt" file and the other in a ".gen" file).
+
+**Third**, create an RMarkdown document (.Rmd) and code away!
+
+***
+
+<h2><span style = "color:darkblue">Setup and Data Importing</span></h2>
+
+```{r Setup, eval=FALSE}
+#Clear R's Brain
+rm(list = ls())
+
+#Install Packages Needed
+packages_needed <- c("dplyr", "knitr", "tidyverse", "genetics",
+                     "adegenet", "ade4", "ape", "pegas",
+                     "hierfstat", "PopGenReport", "genepop",
+                     "diveRsity", "nnet", "HWxtest", "mmod")
+pk_to_install <- packages_needed [!( packages_needed %in% rownames(installed.packages())  )]
+if(length(pk_to_install)>0 ){
+  install.packages(pk_to_install,repos="http://cran.r-project.org")}
+
+#Loading Packages Needed
+library(dplyr)
+library(knitr)
+library(tidyverse)
+library(genetics)
+library(adegenet)
+library(ade4)
+library(pegas)
+library(ape)
+library(hierfstat)
+library(PopGenReport)
+library(genepop)
+library(diveRsity)
+library(nnet)
+library(HWxtest)
+library(mmod)
+
+#Note: some packages are dependent on others (see below)
+#PopGenReport, mmod, & hierfstat are dependent on adegenet/ade4
+#pegas is dependent on adegenet/ade4/ape
+#introgress is dependent on genetics
+
+#Load Data into R
+#For packages that read the genepop format, the .txt or .gen files will work directly in the code.
+DaTa <- read.genepop("inputs/DaTa.gen")
+```
+
+
+<h2><span style = "color:darkblue">Allele Frequencies</span></h2>
+
+```{r Allele Freq, eval=FALSE}
+#Allele Frequencies can be measured using multiple methods. Here, we will show the use of PopGenReport, diveRsity, and genepop.
+
+#PopGenReport
+#This function runs a complete report of PopGen metrics
+popgenreport(DaTa, mk.complete = TRUE, mk.Rcode = TRUE,
+             mk.pdf = TRUE, path.pgr = getwd())
+#The results will be automatically placed in a "results" folder in your working directory. A pdf will be created if the computer has LaTeX downloaded and connected to R.
+
+----------------------------------------------------------------------------
+
+#diveRsity
+#Two functions within diveRsity produce AR
+divBasic(infile = "inputs/DaTa.gen", outfile = NULL, gp = 2, 
+         bootstraps = 1000, HWEexact = TRUE, mcRep = 2000)
+basicStats(infile = "inputs/DaTa.gen", outfile = NULL, fis_ci = TRUE,
+           ar_ci = FALSE, fis_boots = 1000, ar_boots = NULL, 
+           mc_reps = 9999, rarefaction = TRUE, ar_alpha = 0.05, 
+           fis_alpha = 0.05)
+
+----------------------------------------------------------------------------
+  
+#genepop
+basic_info("inputs/DaTa.txt", outputFile = "outputs/DaTa.basic.txt", 
+           verbose = interactive())
+#Result file will be in the "outpurs" folder in your working directory.
+```
+
+
+
+<h2><span style = "color:darkblue">Allelic Richness and Private Alleles</span></h2>
+
+```{r AR, eval=FALSE}
+#Allelic Richness (AR) and Private Alleles can be measured using multiple methods. Here, we will show the use of PopGenReport and diveRsity.
+
+#PopGenReport
+#This function runs a complete report of PopGen metrics
+popgenreport(DaTa, mk.complete = TRUE, mk.Rcode = TRUE,
+             mk.pdf = TRUE, path.pgr = getwd())
+#The results will be automatically placed in a "results" folder in your working directory. A pdf will be created if the computer has LaTeX downloaded and connected to R.
+
+----------------------------------------------------------------------------
+
+#diveRsity
+#Two functions within diveRsity produce AR
+divBasic(infile = "inputs/DaTa.gen", outfile = NULL, gp = 2, 
+         bootstraps = 1000, HWEexact = TRUE, mcRep = 2000)
+basicStats(infile = "inputs/DaTa.gen", outfile = NULL, fis_ci = TRUE,
+           ar_ci = FALSE, fis_boots = 1000, ar_boots = NULL, 
+           mc_reps = 9999, rarefaction = TRUE, ar_alpha = 0.05, 
+           fis_alpha = 0.05)
+```
+
+
+<h2><span style = "color:darkblue">Bottleneck Events</span></h2>
+
+```{r Bottleneck}
+#There are no packages in R that currently measure for bottleneck events.
+```
+
+
+<h2><span style = "color:darkblue">Deviation from Hardy-Weinberg Equilibrium</span></h2>
+
+```{r HWE, eval=FALSE}
+#Deviation from HWE can be measured using multiple methods. Here, we will show the use of pegas, PopGenReport, and diveRsity.
+
+#pegas
+hw.test(DaTa, B = 1000)
+#This function tests both the classical chi-squared test and an exact test based on Monte Carlo permutations
+
+----------------------------------------------------------------------------
+
+#PopGenReport
+#This function runs a complete report of PopGen metrics
+popgenreport(DaTa, mk.complete = TRUE, mk.Rcode = TRUE,
+             mk.pdf = TRUE, path.pgr = getwd())
+#The results will be automatically placed in a "results" folder in your working directory. A pdf will be created if the computer has LaTeX downloaded and connected to R.
+
+----------------------------------------------------------------------------
+
+#diveRsity
+#Two functions within diveRsity produce HWE
+divBasic(infile = "inputs/DaTa.gen", outfile = NULL, gp = 2, 
+         bootstraps = 1000, HWEexact = TRUE, mcRep = 2000)
+basicStats(infile = "inputs/DaTa.gen", outfile = NULL, fis_ci = TRUE,
+           ar_ci = FALSE, fis_boots = 1000, ar_boots = NULL, 
+           mc_reps = 9999, rarefaction = TRUE, ar_alpha = 0.05, 
+           fis_alpha = 0.05)
+#divBasics calculates HWE through a Fischer's Exact Test
+#basicStats calculates HWE with MC and a pseudo-exact test
+```
+
+
+<h2><span style = "color:darkblue">Effective Population Size</span></h2>
+
+```{r Neff, eval=FALSE}
+#Currently in R, there is only a single package that estimates effective population size for microsatellite population genetics; however, this package (NB) requires temporal data.
+
+#NB requires a specific .txt file input
+DaTa_NB <- read.delim("inputs/NB.txt")
+
+#Calculating Effective Population Size
+NB.estimator(DaTa_NB, alleles = rep(x, x), sample.interval = c(x, x), 
+             profile.likelihood = FALSE)
+#The "x's" in the parentheses rep() and c() represent number values.
+#For rep(): the first # is number of alleles per locus and the second # is the number of loci
+#For c(): the #'s represent the generations [example: c(0,8) would be the original and the eighth generations]
+
+#Create a log-likelihood plot for Effective Population Size
+NB.plot.likelihood(DaTa_NB, alleles = rep(x,x), sample.interval = c(x,x),
+                   lb = 300, ub = 2000, step = 200)
+```
+
+
+<h2><span style = "color:darkblue">Genetic Fixation (F~ST~)</span></h2>
+
+```{r Fst, eval=FALSE}
+#Genetic Fixation (Fst) can be measured using multiple methods. Here, we will show the use of hierfstat, PopGenReport, and diveRsity.
+
+#hierfstat
+#This function produces a table in R that presents Fst, Fit, and Fis
+#Fst is the F statistic comparing pop to Total
+#Fit is the F statistic comparing Ind to Total
+#Fis is the F statistic comparing Ind to pop
+fstat(DaTa)
+
+#This function produces a table showing the pairwise Fst interactions.
+pairwise.fst(DaTa)
+
+#This give basic pop gen stats
+basic.stats(DaTa, diploid = TRUE, digits = 4)
+
+----------------------------------------------------------------------------
+
+#PopGenReport
+#This function runs a complete report of PopGen metrics
+popgenreport(DaTa, mk.complete = TRUE, mk.Rcode = TRUE,
+             mk.pdf = TRUE, path.pgr = getwd())
+#The results will be automatically placed in a "results" folder in your working directory. A pdf will be created if the computer has LaTeX downloaded and connected to R.
+
+----------------------------------------------------------------------------
+
+#diveRsity
+diffCalc(infile = "inputs/DaTa.gen", outfile = NULL, fst = TRUE, 
+         pairwise = TRUE, bs_locus = FALSE, bs_pairwise = TRUE, 
+         boots = 1000, ci_type = "individuals", 
+         alpha = 0.05, para = FALSE)
+#This produces both Fst for loci and pairwise Fst
+```
+
+
+<h2><span style = "color:darkblue">Heterozygosity (H~o~ & H~e~)</span></h2>
+
+```{r Ho He, eval=FALSE}
+#Heterozygosity (Ho and He) can be measured using multiple methods. Here, we will show the use of hierfstat, PopGenReport, and diveRsity.
+
+#hierfstat
+#This give basic pop gen stats
+basic.stats(DaTa, diploid = TRUE, digits = 4)
+
+----------------------------------------------------------------------------
+
+#PopGenReport
+#This function runs a complete report of PopGen metrics
+popgenreport(DaTa, mk.complete = TRUE, mk.Rcode = TRUE,
+             mk.pdf = TRUE, path.pgr = getwd())
+#The results will be automatically placed in a "results" folder in your working directory. A pdf will be created if the computer has LaTeX downloaded and connected to R.
+
+----------------------------------------------------------------------------
+
+#diveRsity
+#Two functions within diveRsity produce Ho and He
+divBasic(infile = "inputs/DaTa.gen", outfile = NULL, gp = 2, 
+         bootstraps = 1000, HWEexact = TRUE, mcRep = 2000)
+basicStats(infile = "inputs/DaTa.gen", outfile = NULL, fis_ci = TRUE,
+           ar_ci = FALSE, fis_boots = 1000, ar_boots = NULL, 
+           mc_reps = 9999, rarefaction = TRUE, ar_alpha = 0.05, 
+           fis_alpha = 0.05)
+```
+
+
+<h2><span style = "color:darkblue">Hybridization</span></h2>
+
+```{r Hybrid, eval=FALSE}
+#Hybridization can be measured using multiple methods. Here, we will show the use of mmod, PopGenReport, and diveRsity.
+
+#mmod
+#Jost's D
+D_Jost(DaTa, hsht_mean = "arithmetic")
+
+#pairwise D
+pairwise_D(DaTa, linearized = FALSE, hsht_mean = "arithmetic")
+
+----------------------------------------------------------------------------
+  
+#PopGenReport
+#Produces Jost's D
+#This function runs a complete report of PopGen metrics
+popgenreport(DaTa, mk.complete = TRUE, mk.Rcode = TRUE,
+             mk.pdf = TRUE, path.pgr = getwd())
+#The results will be automatically placed in a "results" folder in your working directory. A pdf will be created if the computer has LaTeX downloaded and connected to R.
+
+----------------------------------------------------------------------------
+  
+#diveRsity
+#Can get D values and pairwise D values
+diffCalc(infile = "inputs/DaTa.gen", outfile = NULL, fst = TRUE, 
+         pairwise = TRUE, bs_locus = FALSE, bs_pairwise = TRUE, 
+         boots = 1000, ci_type = "individuals", 
+         alpha = 0.05, para = FALSE)
+```
+
+
+<h2><span style = "color:darkblue">Inbreeding Coefficient (F~IS~)</span></h2>
+
+```{r Fis, eval=FALSE}
+#Inbreeding Coefficients (Fis) can be measured using multiple methods. Here, we will show the use of hierfstat, diveRsity, and genepop.
+
+#hierfstat
+#This function produces a table in R that presents Fst, Fit, and Fis
+#Fst is the F statistic comparing pop to Total
+#Fit is the F statistic comparing Ind to Total
+#Fis is the F statistic comparing Ind to pop
+fstat(DaTa)
+
+#This give basic pop gen stats
+basic.stats(DaTa, diploid = TRUE, digits = 4)
+
+----------------------------------------------------------------------------
+
+#diveRsity
+#Two functions within diveRsity produce Fis
+divBasic(infile = "inputs/DaTa.gen", outfile = NULL, gp = 2, 
+         bootstraps = 1000, HWEexact = TRUE, mcRep = 2000)
+basicStats(infile = "inputs/DaTa.gen", outfile = NULL, fis_ci = TRUE,
+           ar_ci = FALSE, fis_boots = 1000, ar_boots = NULL, 
+           mc_reps = 9999, rarefaction = TRUE, ar_alpha = 0.05, 
+           fis_alpha = 0.05)
+
+----------------------------------------------------------------------------
+
+#genepop
+genedivFis("inputs/DaTa.txt", sizes = FALSE, 
+           outputFile = "outputs/DaTa.Fis.txt",
+           dataType = "Diploid", verbose = interactive())
+#Result file will be in the "outpurs" folder in your working directory.
+```
+
+
+<h2><span style = "color:darkblue">Isolation by Distance</span></h2>
+
+```{r IBD, eval=FALSE}
+#Calculation of IBD using adegenet/ade4
+#Uses Mantel Test to calculate IBD
+#For this analysis, I created a .csv file with the population name used in the genepop files and the corresponding lat-long data (placed in the inputs folder as "ibd.csv")
+DaTagen <- genind2genpop(DaTa)
+dist_xy <-read.csv("inputs/ibd.csv")
+DaTa$other$xy <- dist_xy
+
+Dgen <- dist.genpop(DaTagen, method = 2)
+Dgeo <- dist(DaTa$other$xy)
+ibd <- mantel.randtest(Dgen, Dgeo)
+ibd
+```
+
+
+<h2><span style = "color:darkblue">Linkage Disequilibrium</span></h2>
+
+```{r LD, eval=FALSE}
+#Calculation of LD using genepop
+test_LD("inputs/DaTa.txt", outputFile = "outputs/DaTa.ld.txt", 
+        settingsFile = "", dememorization = 10000, 
+        batches = 100, iterations = 5000, 
+        verbose = interactive())
+write_LD_tables("inputs/DaTa.txt", outputFile = "outputs/Data.ld.txt.TAB", 
+                verbose = interactive())
+#Result files will be in the "outputs" folder in your working directory.
+```
+
+
+<h2><span style = "color:darkblue">Null Alleles</span></h2>
+
+```{r Null Alleles, eval=FALSE}
+#Null Alleles can be measured using multiple methods. Here, we will show the use of PopGenReport and genepop.
+
+#PopGenReport
+#This function runs a complete report of PopGen metrics
+popgenreport(DaTa, mk.complete = TRUE, mk.Rcode = TRUE,
+             mk.pdf = TRUE, path.pgr = getwd())
+#The results will be automatically placed in a "results" folder in your working directory. A pdf will be created if the computer has LaTeX downloaded and connected to R.
+
+----------------------------------------------------------------------------
+  
+#genepop
+nulls("inputs/DaTa.txt", outputFile = "outputs/DaTa.null.txt",
+      nullAlleleMethod = "", CIcoverage = 0.95, verbose = interactive())
+```
+
+
+<h2><span style = "color:darkblue">Mean Number of Alleles per Locus</span></h2>
+
+```{r Na, eval=FALSE}
+#Mean Number of Alleles per Locus (Na) can be measured using multiple methods. Here, we will show the use of PopGenReport and diveRsity.
+
+#PopGenReport
+#This function runs a complete report of PopGen metrics
+popgenreport(DaTa, mk.complete = TRUE, mk.Rcode = TRUE,
+             mk.pdf = TRUE, path.pgr = getwd())
+#The results will be automatically placed in a "results" folder in your working directory. A pdf will be created if the computer has LaTeX downloaded and connected to R.
+
+----------------------------------------------------------------------------
+
+#diveRsity
+#Two functions within diveRsity produce Na
+divBasic(infile = "inputs/DaTa.gen", outfile = NULL, gp = 2, 
+         bootstraps = 1000, HWEexact = TRUE, mcRep = 2000)
+basicStats(infile = "inputs/DaTa.gen", outfile = NULL, fis_ci = TRUE,
+           ar_ci = FALSE, fis_boots = 1000, ar_boots = NULL, 
+           mc_reps = 9999, rarefaction = TRUE, ar_alpha = 0.05, 
+           fis_alpha = 0.05)
+```
+
+
+<h2><span style = "color:darkblue">Structure</span></h2>
+
+```{r Structure, eval=FALSE}
+#Structure can be measured and plotted using multiple methods. We have already looked at the use of Fst and D-statistics (see: Hybridization) for population structure. Here, we will show the use of adegenet.
+
+#adegenet
+#DAPC: Discriminant Analysis of Principal Components - this analysis was created to measure the number of clusters within population structure.
+grp <- find.clusters(DaTa, max.n.clust=50) #This is to establish clusters for the DAPC (will ask to choose # of PCs to retain and # of clusters)
+dapc1 <- dapc(DaTa, grp$grp) #This will ask for # of PCs to retain and # of discriminant functions to retain
+scatter(dapc1) #This will produce a DAPC figure (much like PCA)
+compoplot(dapc1) #This will produce a STRUCTURE-like figure
+
+#http://adegenet.r-forge.r-project.org/files/tutorial-dapc.pdf
+```
+
+**Note that the line `eval=FALSE` in the header of each R chunk in the .Rmd is to knit the document without running the chunk**. I did this just to show the code for each analysis. To knit the document and run the chunks, remove this line from the chunk headers.
+
+<div class="tocify-extend-page" data-unique="tocify-extend-page" style="height: 0;"></div>
