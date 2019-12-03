@@ -12,12 +12,13 @@ R is a statistical software that with rising importance in the field of Biology 
 
 This repository focuses on the use of the following packages to conduct a standard suit of population genetic analyses:
 * `adegenet`
+* `pegas`
 * `PopGenReport`
 * `diveRsity`
 * `hierfstat`
 * `genepop`
 * `mmod`
 
-and their dependencies: `ade4`, `genetics`, `pegas`, `ape`, `nnet`, and `HWxtest`.
+and their dependencies: `ade4`, `ape`, `genetics`, `nnet`, and `HWxtest`.
 
 The RMarkdown is organized by analyses, using various packages for each.
