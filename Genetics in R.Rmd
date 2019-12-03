@@ -75,7 +75,6 @@ library(mmod)
 #Note: some packages are dependent on others (see below)
 #PopGenReport, mmod, & hierfstat are dependent on adegenet/ade4
 #pegas is dependent on adegenet/ade4/ape
-#introgress is dependent on genetics
 
 #Load Data into R
 #For packages that read the genepop format, the .txt or .gen files will work directly in the code.
